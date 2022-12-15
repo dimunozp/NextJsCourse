@@ -4,11 +4,10 @@ import styles from "@/styles/Event.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import { get } from "lodash";
 
 export default function EventPage({ evt }) {
     const deleteEvent = (e) => {};
-
-    console.log(evt.attributes.image.data.attributes.url);
 
     return (
         <Layout>
@@ -29,7 +28,7 @@ export default function EventPage({ evt }) {
                     at {evt.attributes.time}
                 </span>
                 <h1>{evt.attributes.name}</h1>
-                {evt.attributes.image.data.attributes.url && (
+                {get(evt, "attributes.image.data.attributes.url") && (
                     <div className={styles.image}>
                         <Image
                             src={evt.attributes.image.data.attributes.url}
