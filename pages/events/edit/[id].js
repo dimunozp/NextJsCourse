@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Layout from "@/components/Layout";
 import Modal from "@/components/Modal";
+import ImageUpload from "@/components/ImageUpload";
 import { API_URL } from "@/config/index";
 import styles from "@/styles/Form.module.css";
 import { get } from "lodash";
@@ -68,6 +69,14 @@ export default function EditEventPage({ evt }) {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setValues({ ...values, [name]: value });
+    };
+
+    const imageUploaded = async (e) => {
+        const res = await fetch(`${API_URL}/api/events/${evt.id}?populate=*`);
+        const data = await res.json();
+        console.log(data);
+        setImagePreview(data.data.attributes.image.data.attributes.url);
+        setShowModal(false);
     };
 
     return (
@@ -171,7 +180,7 @@ export default function EditEventPage({ evt }) {
             </div>
 
             <Modal show={showModal} onClose={() => setShowModal(false)}>
-                IMAGE UPLOAD
+                <ImageUpload evtId={evt.id} imageUploaded={imageUploaded} />
             </Modal>
         </Layout>
     );
