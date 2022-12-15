@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Layout from "@/components/Layout";
+import Modal from "@/components/Modal";
 import { API_URL } from "@/config/index";
 import styles from "@/styles/Form.module.css";
 import { get } from "lodash";
@@ -27,6 +28,8 @@ export default function EditEventPage({ evt }) {
             ? get(evt, "attributes.image.data.attributes.url")
             : null
     );
+
+    const [showModal, setShowModal] = useState(false);
 
     const router = useRouter();
 
@@ -159,10 +162,17 @@ export default function EditEventPage({ evt }) {
             )}
 
             <div>
-                <button className="btn-secondary">
+                <button
+                    onClick={() => setShowModal(true)}
+                    className="btn-secondary"
+                >
                     <FaImage /> Set Image
                 </button>
             </div>
+
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+                IMAGE UPLOAD
+            </Modal>
         </Layout>
     );
 }
