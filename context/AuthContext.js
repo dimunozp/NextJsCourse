@@ -1,12 +1,19 @@
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { NEXT_URL } from "@/config/index";
+import { set } from "lodash";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        checkUserLoggedIn();
+    }, []);
 
     // Register user
     const register = async (user) => {};
@@ -28,6 +35,7 @@ export const AuthProvider = ({ children }) => {
 
         if (res.ok) {
             setUser(data.user);
+            router.push("/account/dashboard");
         } else {
             setError(data.message);
         }
@@ -37,10 +45,21 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {};
 
     // Check if user is logged in
-    const checkUserLoggedIn = async (user) => {};
+    const checkUserLoggedIn = async (user) => {
+        const res = await fetch(`${NEXT_URL}/api/user`);
+        const data = await res.json();
+
+        if (res.ok) {
+            setUser(data.user);
+        } else {
+            setUser(null);
+        }
+    };
 
     return (
-        <AuthContext.Provider value={{ user, error, register, login, logout, setError }}>
+        <AuthContext.Provider
+            value={{ user, error, register, login, logout, setError }}
+        >
             {children}
         </AuthContext.Provider>
     );
