@@ -13,7 +13,14 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
 
-    const { register, error } = useContext(AuthContext);
+    const { register, error, setError } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+            setError(null);
+        }
+    }, [error]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -72,7 +79,7 @@ export default function RegisterPage() {
                             onChange={(e) => setPasswordConfirm(e.target.value)}
                         />
                     </div>
-                    <input type="submit" value="Login" className="btn" />
+                    <input type="submit" value="Register" className="btn" />
                 </form>
 
                 <p>
