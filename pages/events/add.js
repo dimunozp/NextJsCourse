@@ -30,6 +30,7 @@ export default function AddEventPage() {
 
         if (hasEmptyFields) {
             toast.error("Please fill in all fields");
+            return;
         }
 
         const res = await fetch(`${API_URL}/api/events`, {
