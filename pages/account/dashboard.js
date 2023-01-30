@@ -3,10 +3,31 @@ import Layout from "@/components/Layout";
 import DashboardEvent from "@/components/DashboardEvent";
 import { API_URL } from "@/config/index";
 import styles from "@/styles/Dashboard.module.css";
+import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function DashboardPage({ events }) {
-    const deleteEvent = (id) => {
-        console.log(id);
+export default function DashboardPage({ events, token }) {
+    const router = useRouter();
+
+    const deleteEvent = async (id) => {
+        if (confirm("Are tou sure?")) {
+            const res = await fetch(`${API_URL}/api/events/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await res.json();
+            console.log(data);
+
+            if (!res.ok) {
+                toast.error("Something went wrong");
+            } else {
+                router.reload();
+            }
+        }
     };
 
     return (
@@ -14,6 +35,7 @@ export default function DashboardPage({ events }) {
             <div className={styles.dash}>
                 <h1>Dashboard</h1>
                 <h3>My Events</h3>
+                <ToastContainer />
 
                 {events.map((evt) => (
                     <DashboardEvent
@@ -42,6 +64,7 @@ export async function getServerSideProps({ req }) {
     return {
         props: {
             events,
+            token
         },
     };
 }

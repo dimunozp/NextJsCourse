@@ -12,8 +12,9 @@ import { API_URL } from "@/config/index";
 import styles from "@/styles/Form.module.css";
 import { get } from "lodash";
 import Image from "next/image";
+import { parseCookies } from "@/helpers/index";
 
-export default function EditEventPage({ evt }) {
+export default function EditEventPage({ evt, token }) {
     const [values, setValues] = useState({
         name: evt.attributes.name,
         performers: evt.attributes.performers,
@@ -50,6 +51,7 @@ export default function EditEventPage({ evt }) {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
                 data: {
@@ -59,10 +61,14 @@ export default function EditEventPage({ evt }) {
         });
 
         if (!res.ok) {
+            if (res.status === "403" || res.status === "401") {
+                toast.error("Unauthorized");
+                return;
+            }
             toast.error("Something Went Wrong");
         } else {
             const evt = await res.json();
-            router.push(`/events/${evt.data.attributes.slug}`);
+            router.push(`/events/${evt.slug}`);
         }
     };
 
@@ -74,7 +80,6 @@ export default function EditEventPage({ evt }) {
     const imageUploaded = async (e) => {
         const res = await fetch(`${API_URL}/api/events/${evt.id}?populate=*`);
         const data = await res.json();
-        console.log(data);
         setImagePreview(data.data.attributes.image.data.attributes.url);
         setShowModal(false);
     };
@@ -180,7 +185,11 @@ export default function EditEventPage({ evt }) {
             </div>
 
             <Modal show={showModal} onClose={() => setShowModal(false)}>
-                <ImageUpload evtId={evt.id} imageUploaded={imageUploaded} />
+                <ImageUpload
+                    evtId={evt.id}
+                    imageUploaded={imageUploaded}
+                    token={token}
+                />
             </Modal>
         </Layout>
     );
@@ -189,12 +198,12 @@ export default function EditEventPage({ evt }) {
 export async function getServerSideProps({ params: { id }, req }) {
     const res = await fetch(`${API_URL}/api/events/${id}?populate=*`);
     const evt = await res.json();
-
-    // req.headers.cookie
+    const { token } = parseCookies(req);
 
     return {
         props: {
             evt: evt.data,
+            token,
         },
     };
 }

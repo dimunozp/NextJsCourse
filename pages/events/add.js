@@ -49,7 +49,7 @@ export default function AddEventPage({token}) {
 
         if (!res.ok) {
             if (res.status === "403" || res.status === "401") {
-                toast.error("No token included");
+                toast.error("Unauthorized");
                 return;
             }
             toast.error("Something Went Wrong");
